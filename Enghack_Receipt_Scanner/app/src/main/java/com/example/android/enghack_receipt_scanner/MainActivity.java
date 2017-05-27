@@ -58,11 +58,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         mSettingHeaders = getHeaders();
         mSettingChildren = getChildren(mSettingHeaders);
         mAdapter = new ExpandableListAdapter(this);
@@ -146,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void save() {
+        Log.d("Saving", "Saving");
         if (mPreferences == null) {
             mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
@@ -204,8 +201,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void reset() {
+        Log.d("RESET", "RESETTING");
         if (mPreferences != null) mPreferences.edit().clear().commit();
+        Log.d("PREFERNCES", mPreferences.getAll().toString());
         mAdapter = new ExpandableListAdapter(this);
+        mSettingHeaders = new ArrayList<>();
+        mSettingChildren = new HashMap<>();
         mExpandableList.setAdapter(mAdapter);
     }
 
