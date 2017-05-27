@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:color/background_light">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/list_child_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="asdf"
-        android:gravity="center_vertical"
-        android:layout_alignParentLeft="true"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:elevation="2dp"
+        android:layout_marginLeft="8dp"
+        android:background="@color/colorLight"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/list_child_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_alignParentLeft="true"/>
 
-    <TextView
-        android:id="@+id/list_child_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="jkl;"
-        android:gravity="center_vertical"
-        android:layout_alignParentRight="true"/>
+        <TextView
+            android:id="@+id/list_child_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginRight="4dp"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

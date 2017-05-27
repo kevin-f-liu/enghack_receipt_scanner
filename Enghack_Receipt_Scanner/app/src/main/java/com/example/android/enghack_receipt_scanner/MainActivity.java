@@ -4,8 +4,11 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -29,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static android.R.attr.width;
+
 public class MainActivity extends AppCompatActivity {
     static private int RECEIPT_CAPTURE = 9001;
 
@@ -44,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        ActionBar topBar = getSupportActionBar();
+        if (topBar != null) {
+            topBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#6A8347")));
+        }
+
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         TextView cameraText = (TextView) findViewById(R.id.camera_text);
@@ -58,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
+        mExpandableList.setIndicatorBounds(width-100, width);
     }
 
     @Override
@@ -140,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }catch (Exception e) {
+                Toast.makeText(this, "Error. Please try scanning again.", Toast.LENGTH_LONG).show();
             }
         }
     }

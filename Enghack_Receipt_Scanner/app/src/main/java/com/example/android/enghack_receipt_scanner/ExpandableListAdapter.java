@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by kevin on 2017-05-26.
@@ -102,27 +103,31 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
         Log.d("CHILD", String.valueOf(childPosition));
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_child, parent, false);
-            TextView title = (TextView) convertView.findViewById(R.id.list_child_name);
-
+            TextView price;
             if (childPosition == 0) {
-                title.setText(((Product) getChild(groupPosition, childPosition)).getMonth().toString()+"/"
-                        +((Product) getChild(groupPosition, childPosition)).getDay()+"/"
-                        +((Product) getChild(groupPosition, childPosition)).getYear()+ " - " + ((Product) getChild(groupPosition, childPosition)).getName());
+                convertView = layoutInflater.inflate(R.layout.list_child_date, parent, false);
+                TextView name = (TextView) convertView.findViewById(R.id.list_child_date_name);
+                price = (TextView) convertView.findViewById(R.id.list_child_date_price);
+                name.setText(((Product) getChild(groupPosition, childPosition)).getName());
+                TextView date = (TextView) convertView.findViewById(R.id.date_text);
+                Product product = ((Product) getChild(groupPosition, childPosition));
+                date.setText(String.valueOf(product.getMonth())+"/"+ String.valueOf(product.getDay())
+                    +"/"+String.valueOf(product.getYear()));
             }
             else if (((Product) getChild(groupPosition, childPosition)).getDay() != ((Product) getChild(groupPosition, childPosition-1)).getDay()
                     || ((Product) getChild(groupPosition, childPosition)).getMonth() != ((Product) getChild(groupPosition, childPosition-1)).getMonth()
                     || (((Product) getChild(groupPosition, childPosition)).getYear() - ((Product) getChild(groupPosition, childPosition-1)).getYear()) != 0) {
-                title.setText(((Product) getChild(groupPosition, childPosition)).getMonth().toString()+"/"
-                        +((Product) getChild(groupPosition, childPosition)).getDay()+"/"
-                        +((Product) getChild(groupPosition, childPosition)).getYear()+ " - " + ((Product) getChild(groupPosition, childPosition)).getName());
-//                Log.d("Value", String.valueOf(((((Product) getChild(groupPosition, childPosition)).getYear()) - (((Product) getChild(groupPosition, childPosition-1)).getYear()))==0));
-//                Log.d("BOOLEAN", String.valueOf(((Product) getChild(groupPosition, childPosition)).getYear()==((Product) getChild(groupPosition, childPosition-1)).getYear()));
+                convertView = layoutInflater.inflate(R.layout.list_child_date, parent, false);
+                price = (TextView) convertView.findViewById(R.id.list_child_date_price);
+                TextView name = (TextView) convertView.findViewById(R.id.list_child_date_name);
+                name.setText(((Product) getChild(groupPosition, childPosition)).getName());
             }
             else {
-                title.setText("    " + ((Product) getChild(groupPosition, childPosition)).getName());
+                convertView = layoutInflater.inflate(R.layout.list_child, parent, false);
+                price = (TextView) convertView.findViewById(R.id.list_child_price);
+                TextView title = (TextView) convertView.findViewById(R.id.list_child_name);
+                title.setText(((Product) getChild(groupPosition, childPosition)).getName());
             }
-            TextView price = (TextView) convertView.findViewById(R.id.list_child_price);
             price.setText("$" + ((Product)getChild(groupPosition, childPosition)).getPrice().toString());
         }
 

@@ -15,6 +15,9 @@ package com.example.android.enghack_receipt_scanner;
  * limitations under the License.
  */
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v7.app.ActionBar;
 import android.view.ScaleGestureDetector;
 
 import android.Manifest;
@@ -39,6 +42,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -96,6 +100,13 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.ocr_capture);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        ActionBar topBar = getSupportActionBar();
+        if (topBar != null) {
+            topBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#6A8347")));
+        }
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay<OcrGraphic>) findViewById(R.id.graphicOverlay);

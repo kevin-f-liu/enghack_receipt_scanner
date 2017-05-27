@@ -5,22 +5,35 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorLight"
     tools:context="com.example.android.enghack_receipt_scanner.MainActivity">
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:background="@drawable/main_background"
         android:padding="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:layout_height="0dp"
+        android:elevation="2dp"
         android:layout_weight="1">
         <ExpandableListView
             android:id="@+id/expandable_list"
+            android:layout_margin="4dp"
             android:layout_width="match_parent"
+            android:dividerHeight="1.5dp"
             android:layout_height="match_parent" />
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:minLines="2"
+            android:hint="You don't have any items on your budget!\nClick the bottom button to go to the camera."/>
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/camera_button"
@@ -29,6 +42,7 @@
         android:layout_marginBottom="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
+        android:elevation="2dp"
         android:background="@drawable/camera_button"
         android:layout_gravity="bottom">
 
@@ -37,6 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="32sp"
+            android:textColor="@android:color/white"
             android:text="@string/fa_camera"
             android:layout_gravity="center"/>
 
