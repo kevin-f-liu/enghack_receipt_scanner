@@ -157,8 +157,10 @@ public class MainActivity extends AppCompatActivity {
                         mExpandableList.setAdapter(mAdapter);
                         for (int i = 0; i < mAdapter.getGroupCount()-1; i++) {
                             mExpandableList.collapseGroup(i);
+                            if (((String) mAdapter.getGroup(i)).equals("store")){
+                                mExpandableList.expandGroup(i);
+                            }
                         }
-                        mExpandableList.expandGroup(mAdapter.getGroupCount()-1);
                         save();
                     }
                 }
