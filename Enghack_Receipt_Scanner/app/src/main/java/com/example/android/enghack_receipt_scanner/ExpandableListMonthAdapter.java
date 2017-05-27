@@ -63,6 +63,10 @@ public class ExpandableListMonthAdapter extends ExpandableListAdapter {
             }
         }
         mHeaders = headers;
+        Log.d("HEADERSIZE", String.valueOf(mHeaders.size()));
+        for (int i = 0; i<mHeaders.size(); i++){
+            Log.d("HEADER", mHeaders.get(i));
+        }
 
         HashMap<String, List<Product>> children = new HashMap<>();
         for (String header : mHeaders) {
@@ -99,16 +103,20 @@ public class ExpandableListMonthAdapter extends ExpandableListAdapter {
         for (String header : mHeaders) {
             mChildren.put(header, new ArrayList<Product>());
             for (Product toAdd : children.get(header)) {
+                Log.d("PRODUCT NAME", toAdd.getName());
                 if (mChildren.get(header).size() == 0) {
                     mChildren.get(header).add(toAdd);
                 }
                 else {
+                    Boolean added = false;
                     for (int i = mChildren.get(header).size()-1; i >= 0; i--){
                         if (toAdd.getStore().equals(mChildren.get(header).get(i).getStore())) {
                             mChildren.get(header).add(i+1, toAdd);
+                            added = true;
                             break;
                         }
                     }
+                    if (!added) {mChildren.get(header).add(0, toAdd);}
                 }
             }
             Log.d("MCHILDREN: " + header, String.valueOf(mChildren.get(header).size()));

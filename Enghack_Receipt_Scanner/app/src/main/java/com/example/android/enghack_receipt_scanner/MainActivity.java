@@ -122,7 +122,10 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<Product> allProducts = new ArrayList<>();
                 for (String header : mSettingHeaders){
                     for (Product product : mSettingChildren.get(header)){
-                        if (!product.getName().toUpperCase().equals("TOTAL")) {
+                        String name = product.getName().trim().toUpperCase();
+                        Boolean shouldAdd = !(name.equals("TOTAL"));
+                        if (shouldAdd) {
+                            Log.d("PRODUCT", product.getName());
                             allProducts.add(product);
                         }
                     }
@@ -187,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             mSettingChildren.put(store, products);
                         }
+
                         mAdapter = new ExpandableListAdapter(this);
                         mAdapter.populateHeaders(mSettingHeaders);
                         mAdapter.populateChildren(mSettingChildren);
