@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         TextView cameraText = (TextView) findViewById(R.id.camera_text);
         cameraText.setTypeface(getFATypeface(this));
 
@@ -56,6 +58,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSettingHeaders = getHeaders();
+        mSettingChildren = getChildren(mSettingHeaders);
+        mAdapter = new ExpandableListAdapter(this);
+        mAdapter.populateHeaders(mSettingHeaders);
+        mAdapter.populateChildren(mSettingChildren);
+        mExpandableList.setAdapter(mAdapter);
+        for (int i = 0; i < mAdapter.getGroupCount(); i++) {
+            mExpandableList.expandGroup(i);
+        }
     }
 
     @Override
@@ -117,9 +133,10 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.populateHeaders(mSettingHeaders);
                         mAdapter.populateChildren(mSettingChildren);
                         mExpandableList.setAdapter(mAdapter);
-//                        for (int i = 0; i < mAdapter.getGroupCount(); i++) {
-//                            mExpandableList.expandGroup(i);
-//                        }
+                        for (int i = 0; i < mAdapter.getGroupCount(); i++) {
+                            mExpandableList.expandGroup(i);
+                        }
+                        save();
                     }
                 }
             }catch (Exception e) {
@@ -159,14 +176,17 @@ public class MainActivity extends AppCompatActivity {
     private List<String> getHeaders() {
         if (mPreferences != null && mPreferences.contains("Headers")) {
             Set<String> temp = mPreferences.getStringSet("Headers", null);
-            if (temp == null) return null;
-            else return new ArrayList<String>(temp);
+            if (temp == null) return new ArrayList<>();
+            else {
+                return new ArrayList<String>(temp);
+            }
         }
-        return null;
+        return new ArrayList<String>();
     }
 
     private HashMap<String, List<Product>> getChildren(List<String> headers){
         HashMap<String, List<Product>> toReturn = new HashMap<>();
+        Log.d("SIZE", String.valueOf(headers.size()));
 
         for (String title : headers) {
             Set<String> temp = mPreferences.getStringSet(title, null);
