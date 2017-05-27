@@ -155,9 +155,10 @@ public class MainActivity extends AppCompatActivity {
                         mAdapter.populateHeaders(mSettingHeaders);
                         mAdapter.populateChildren(mSettingChildren);
                         mExpandableList.setAdapter(mAdapter);
-                        for (int i = 0; i < mAdapter.getGroupCount(); i++) {
-                            mExpandableList.expandGroup(i);
+                        for (int i = 0; i < mAdapter.getGroupCount()-1; i++) {
+                            mExpandableList.collapseGroup(i);
                         }
+                        mExpandableList.expandGroup(mAdapter.getGroupCount()-1);
                         save();
                     }
                 }
