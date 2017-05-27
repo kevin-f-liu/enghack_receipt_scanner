@@ -1,5 +1,6 @@
 package com.example.android.enghack_receipt_scanner;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +8,9 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
@@ -26,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ExpandableListView mExpandableList;
     private ExpandableListAdapter mAdapter;
     private List<String> mSettingHeaders;
-    private HashMap<String, List<String>> mSettingChildren;
+    private HashMap<String, List<Product>> mSettingChildren;
     private SharedPreferences mPreferences;
 
 
@@ -49,6 +53,21 @@ public class MainActivity extends AppCompatActivity {
         mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.reset_button) {
+            reset();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public Typeface getFATypeface(Context context) {
         return Typeface.createFromAsset(context.getAssets(), "fonts/fontawesome-webfont.ttf");
@@ -85,11 +104,16 @@ public class MainActivity extends AppCompatActivity {
             delete("Headers");
         }
         mPreferences.edit().putStringSet("Headers", new HashSet<String>(mSettingHeaders)).commit();
+
         for (String title : mSettingHeaders) {
+            List<String> serializedProducts = new ArrayList<>();
             if (mPreferences.contains(title)) {
                 delete(title);
             }
-            mPreferences.edit().putStringSet(title, new HashSet<String>(mSettingChildren.get(title))).commit();
+            for (Product item : mSettingChildren.get(title)) {
+                serializedProducts.add(item.serialize());
+            }
+            mPreferences.edit().putStringSet(title, new HashSet<String>(serializedProducts)).commit();
         }
     }
 
@@ -106,6 +130,30 @@ public class MainActivity extends AppCompatActivity {
             else return new ArrayList<String>(temp);
         }
         return null;
+    }
+
+    private HashMap<String, List<Product>> getChildren(List<String> headers){
+        HashMap<String, List<Product>> toReturn = new HashMap<>();
+
+        for (String title : headers) {
+            Set<String> temp = mPreferences.getStringSet(title, null);
+            if (temp != null) {
+                ArrayList<String> serializedList = new ArrayList<String>(temp);
+                ArrayList<Product> productList = new ArrayList<Product>();
+                for (String serializedData : serializedList) {
+                    productList.add(Product.makeFromSerialize(serializedData));
+                }
+                toReturn.put(title, productList);
+            }
+        }
+
+        return toReturn;
+    }
+
+    private void reset() {
+        if (mPreferences != null) mPreferences.edit().clear().commit();
+        mAdapter = new ExpandableListAdapter(this);
+        mExpandableList.setAdapter(mAdapter);
     }
 
 }
