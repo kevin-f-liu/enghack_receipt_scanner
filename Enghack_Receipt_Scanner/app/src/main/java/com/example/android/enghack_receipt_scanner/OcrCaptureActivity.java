@@ -406,13 +406,14 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             }
             if (prices == null) {
                 ArrayList<? extends Text> lines = new ArrayList<>(block.getComponents());
-                if (lines.get(0).getValue().contains("$")) {
+                if (lines.get(0).getValue().matches(".*\\d[.,]\\d.*")) {
                     // If the list's first item is a price
                     prices = block;
                 }
             }
         }
         storeName = store.getComponents().get(0);
+        Log.d("STORE NAME", storeName.getValue());
         if (prices == null) {
             Log.e("NO PRICES!", "No prices found");
             return null;
@@ -457,6 +458,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         ArrayList<Text> tempPriceList = new ArrayList<>(prices.getComponents());
         ArrayList<Text> tempItemList = new ArrayList<>(items.getComponents());
 
+        // Cull both price and item lists after the Total item
         for (int i = 0; i < tempItemList.size(); i++) {
             priceList.add(tempPriceList.get(i));
             itemList.add(tempItemList.get(i));
@@ -464,12 +466,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 break;
             }
         }
-        /*
-        int dif = itemList.size() - priceList.size();
-        for (int i = 1; i <= dif; i++) {
-            itemList.remove(itemList.size() - i);
-        }
-        */
+
 
         Log.d("STORE:", storeName.getValue());
         Log.d("DATE:", date.getValue());
