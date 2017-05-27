@@ -123,6 +123,66 @@ public class ExpandableListMonthAdapter extends ExpandableListAdapter {
     }
 
     @Override
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+
+        if (convertView == null) {
+            convertView = layoutInflater.inflate(R.layout.list_header, parent, false);
+            TextView title = (TextView) convertView.findViewById(R.id.list_header_text);
+            String original = (String)getGroup(groupPosition);
+            Integer seperator = original.indexOf("/");
+            String year = original.substring(seperator+1);
+            String output = "";
+            if (original.length() > 0) {
+                switch (Integer.valueOf(original.substring(0, seperator))) {
+                    case 1:
+                        output = "January " + year;
+                        break;
+                    case 2:
+                        output = "February " + year;
+                        break;
+                    case 3:
+                        output = "March " + year;
+                        break;
+                    case 4:
+                        output = "April " + year;
+                        break;
+                    case 5:
+                        output = "May " + year;
+                        break;
+                    case 6:
+                        output = "June " + year;
+                        break;
+                    case 7:
+                        output = "July " + year;
+                        break;
+                    case 8:
+                        output = "August " + year;
+                        break;
+                    case 9:
+                        output = "September " + year;
+                        break;
+                    case 10:
+                        output = "October " + year;
+                        break;
+                    case 11:
+                        output = "November " + year;
+                        break;
+                    case 12:
+                        output = "December " + year;
+                        break;
+                    default:
+                        output = "Default";
+                        break;
+                }
+            }
+            title.setText(output);
+        }
+
+        return convertView;
+    }
+
+    @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
 
