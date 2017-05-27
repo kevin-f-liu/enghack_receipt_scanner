@@ -351,7 +351,17 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
 
         ArrayList<Product> products = cleanTextBlockInfo(output);
-        data.putExtra(TextBlockObject, "asdf");
+        ArrayList<String> serializedProducts = new ArrayList<>();
+        try {
+            for (Product item : products) {
+                serializedProducts.add(item.serialize());
+            }
+        } catch (Exception e) {
+            Log.d("ADDING_SERIALIZED", e.getClass().toString());
+            Log.d("ADDING_SERIALIZED", e.getMessage());
+        }
+
+        data.putExtra("TextBlockObject", serializedProducts);
 
         setResult(CommonStatusCodes.SUCCESS, data);
         finish();
@@ -362,6 +372,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         TextBlock items = null;
         TextBlock prices = null;
         TextBlock store = null;
+        Text storeName = null;
         TextBlock date = null;
         ArrayList<Product> products = new ArrayList<>();
 
@@ -380,6 +391,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 }
             }
         }
+        storeName = store.getComponents().get(0);
         if (prices == null) {
             Log.e("NO PRICES!", "No prices found");
             return null;
@@ -427,7 +439,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             itemList.remove(itemList.size() - i);
         }
 
-        Log.d("STORE:", store.getValue());
+        Log.d("STORE:", storeName.getValue());
         Log.d("DATE:", date.getValue());
         for (Text t : priceList) {
             Log.d("PRICES:", t.getValue());
@@ -438,32 +450,10 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
         for (int i = 0; i < itemList.size(); i++) {
             // Construct arraylist of product
-            products.add(new Product(itemList.get(i), store.getValue(), priceList.get(i), date.getValue()));
+            products.add(new Product(itemList.get(i).getValue(), storeName.getValue(), priceList.get(i).getValue(), date.getValue(), Product.MM_DD_YYYYY));
         }
-
-        /*
-        for (TextBlock block : intext) {
-           ArrayList<? extends Text> lines  = new ArrayList<>();
-            ArrayList<String> prices = new ArrayList<>();
-            ArrayList<String> items = new ArrayList<>();
-            lines = new ArrayList<>(block.getComponents());
-            Log.d("NUMBER_LINES", String.valueOf(lines.size()));
-           if (lines.size() > 1) {
-               // Lines inside
-               for (Text t : lines) {
-                   // Each line
-                   Log.d("LINE:", t.getValue());
-                   if (t.getValue().contains("$")) {
-                       prices.add(t.getValue());
-                   }
-               }
-           } else if (lines.size() == 1){
-               // One item inside
-               Log.d("WORD:", lines.get(0).getValue());
-           }
-        }
-        */
-        return null;
+        Log.d("SIZE", String.valueOf(products.size()));
+        return products;
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {

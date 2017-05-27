@@ -107,7 +107,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_header, parent, false);
+            convertView = layoutInflater.inflate(R.layout.list_child, parent, false);
             TextView title = (TextView) convertView.findViewById(R.id.list_child_name);
             title.setText(((Product)getChild(groupPosition, childPosition)).getName());
             TextView price = (TextView) convertView.findViewById(R.id.list_child_price);

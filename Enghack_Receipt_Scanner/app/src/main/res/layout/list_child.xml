@@ -8,12 +8,16 @@
         android:id="@+id/list_child_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical|left"/>
+        android:text="asdf"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"/>
 
     <TextView
         android:id="@+id/list_child_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical|right"/>
+        android:text="jkl;"
+        android:gravity="center_vertical"
+        android:layout_alignParentRight="true"/>
 
 </RelativeLayout>
