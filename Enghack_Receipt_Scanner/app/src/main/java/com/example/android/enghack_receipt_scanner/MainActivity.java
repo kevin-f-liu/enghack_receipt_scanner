@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,9 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 
 public class MainActivity extends AppCompatActivity {
     static private int RC_BARCODE_CAPTURE = 9001;
+
+    private ExpandableListView mExpandableList;
+    private ExpandableListAdapter mAdapater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
                 switchToCamera();
             }
         });
+
+        mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
     }
 
 
@@ -49,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
+        }
+
+        if (mAdapater == null) {
+            mAdapater = new ExpandableListAdapter(this);
+            //populate data
+            mExpandableList.setAdapter(mAdapater);
         }
     }
 }
