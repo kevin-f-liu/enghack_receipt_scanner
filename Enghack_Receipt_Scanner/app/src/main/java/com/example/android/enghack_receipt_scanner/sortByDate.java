@@ -1,9 +1,10 @@
-package com.example.android.enghack_receipt_scanner.ui;
+package com.example.android.enghack_receipt_scanner;
 
 import com.example.android.enghack_receipt_scanner.Product;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by janak on 2017-05-27.
@@ -15,19 +16,19 @@ public class sortByDate {
         return year*10000+month*100+day;
     }
 
-    public static HashMap<Integer, ArrayList<Product>> sortByDate(ArrayList<Product> prod) {
+    public static HashMap<Integer, List<Product>> sort(ArrayList<Product> prod) {
 
-        HashMap<Integer, ArrayList<Product>> productSorted = new HashMap<>();
+        HashMap<Integer, List<Product>> productSorted = new HashMap<>();
 
         for (Product p : prod) {
             int date = dateInt(p.getDay(), p.getMonth(), p.getYear());
             if (productSorted.get(date)==null) {
-                ArrayList<Product> plist = new ArrayList<Product>();
+                List<Product> plist = new ArrayList<Product>();
                 plist.add(p);
                 productSorted.put(date, plist);
             }
             else {
-                ArrayList<Product> plist = productSorted.get(date);
+                List<Product> plist = productSorted.get(date);
                 plist.add(p);
             }
         }

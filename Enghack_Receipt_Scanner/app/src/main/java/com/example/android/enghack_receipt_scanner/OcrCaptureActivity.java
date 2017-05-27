@@ -58,8 +58,10 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.Math.abs;
 
@@ -348,12 +350,13 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         TextBlock text = null;
         Intent data = new Intent();
         ArrayList<TextBlock> output = new ArrayList<>();
-        for (OcrGraphic graphic : mGraphicOverlay.mGraphics) {
+        Set<OcrGraphic> mGraphics = mGraphicOverlay.mGraphics;
+        for (OcrGraphic graphic : mGraphics) {
             if (graphic != null) {
                 text = graphic.getTextBlock();
                 if (text != null) {
                     output.add(text);
-                    Log.d("TextBlockObject", text.getValue() + "  " + text.getBoundingBox().top);
+                    Log.d("TextBlockObject", text.getValue() + "  " + text.getBoundingBox().top + "  " + text.getBoundingBox().left + "  " + text.getBoundingBox().bottom + "  " + text.getBoundingBox().right);
                 } else {
                     Log.d(TAG, "text data is null");
                 }
@@ -390,13 +393,14 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     }
 
     private ArrayList<Product> cleanTextBlockInfo(ArrayList<TextBlock> intext) {
-        TextBlock items = null;
-        TextBlock prices = null;
+        ArrayList<TextBlock> itemBlockList = new ArrayList<>();
+        ArrayList<TextBlock> priceBlockList = new ArrayList<>();
         TextBlock store = null;
-        Text storeName = null;
+        Text storeName;
         TextBlock date = null;
         ArrayList<Product> products = new ArrayList<>();
 
+        // Find the title through highest block element
         int highestBlockTop = 999999;
         for (TextBlock block : intext) {
             // Find store name as highest block
@@ -404,41 +408,59 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 store = block;
                 highestBlockTop = store.getBoundingBox().top;
             }
-            if (prices == null) {
+        }
+        storeName = store.getComponents().get(0);
+        Log.d("STORE NAME", storeName.getValue());
+
+        // Find the price block(s) using regex
+        for (TextBlock block : intext) {
+            if (priceBlockList.size() == 0) {
                 ArrayList<? extends Text> lines = new ArrayList<>(block.getComponents());
-                if (lines.get(0).getValue().contains("$")) {
+                if (lines.get(0).getValue().matches(".*\\d[.,]\\d.*")) {
                     // If the list's first item is a price
-                    prices = block;
+                    priceBlockList.add(block);
                 }
             }
         }
-        storeName = store.getComponents().get(0);
-        if (prices == null) {
+        if (priceBlockList.size() == 0) {
             Log.e("NO PRICES!", "No prices found");
             return null;
         }
+
+        // Find the item name block(s) using alignment with pricing and each other
+        int topCoordPrice = getHighestBlock(priceBlockList).getBoundingBox().top;
         for (TextBlock block : intext) {
-            if (items == null && !block.equals(prices)){
-                int topCoordPrice = prices.getBoundingBox().top;
+            // Find head
+            if (itemBlockList.size() == 0 && !priceBlockList.contains(block)){
                 int topCoordItem = block.getBoundingBox().top;
-                Log.d("COORD DATA:", topCoordItem + "   " + topCoordPrice);
+                //Log.d("COORD DATA:", topCoordItem + "   " + topCoordPrice);
                 if (abs(topCoordItem - topCoordPrice) < COMPARE_PARAMETER) {
-                    items = block;
+                    itemBlockList.add(block);
                 }
             }
         }
-        if (items == null) {
+        for (TextBlock block : intext) {
+            // Find other blocks that share left side plus bottom-top
+            if (!priceBlockList.contains(block) && !itemBlockList.contains(block)) {
+                if (checkStackUnder(block, itemBlockList, -1)) {
+                    itemBlockList.add(block);
+                }
+            }
+        }
+        if (itemBlockList.size() == 0) {
             Log.e("NO ITEMS!", "No items found");
             return null;
         }
+
         // Find date block or containing block
         for (TextBlock block : intext) {
-            if (!block.equals(items) && !block.equals(prices)) {
+            if (!itemBlockList.contains(block) && !priceBlockList.contains(block)) {
                 if (block.getComponents().size() == 1 && block.getValue().contains("/")) {
                     date = block;
                 } else if (block.getComponents().size() > 1) {
                     ArrayList<Text> elements = new ArrayList<>(block.getComponents());
                     for (Text t : elements) {
+                        // Change to regex if have time; more matching
                         if (t.getValue().contains("/")) {
                             date = block;
                         }
@@ -450,13 +472,14 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.e("NO DATE!", "No date found");
             return null;
         }
-        Log.d("PRICES:", prices.getValue());
-        Log.d("ITEMS:", items.getValue());
+
+        // Convert all block and block arraylists into text arraylists
         ArrayList<Text> priceList = new ArrayList<>();
         ArrayList<Text> itemList = new ArrayList<>();
-        ArrayList<Text> tempPriceList = new ArrayList<>(prices.getComponents());
-        ArrayList<Text> tempItemList = new ArrayList<>(items.getComponents());
+        ArrayList<Text> tempPriceList = collapseBlockArray(priceBlockList);
+        ArrayList<Text> tempItemList = collapseBlockArray(itemBlockList);
 
+        // Cull both price and item lists after the Total item
         for (int i = 0; i < tempItemList.size(); i++) {
             priceList.add(tempPriceList.get(i));
             itemList.add(tempItemList.get(i));
@@ -464,12 +487,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 break;
             }
         }
-        /*
-        int dif = itemList.size() - priceList.size();
-        for (int i = 1; i <= dif; i++) {
-            itemList.remove(itemList.size() - i);
-        }
-        */
+
 
         Log.d("STORE:", storeName.getValue());
         Log.d("DATE:", date.getValue());
@@ -486,6 +504,56 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
         Log.d("SIZE", String.valueOf(products.size()));
         return products;
+    }
+
+    private boolean checkStackUnder(TextBlock tb, ArrayList<TextBlock> reference, int side) {
+        int tbside = side < 0 ? tb.getBoundingBox().left : tb.getBoundingBox().right;
+
+        int tbtop = tb.getBoundingBox().top;
+        boolean valid = false;
+        for (TextBlock reftb : reference) { //402
+            Log.d("CHECK STACK TOP", tbtop + " " + reftb.getBoundingBox().bottom + " " + String.valueOf(abs(tbtop - reftb.getBoundingBox().bottom)));
+            if (abs(tbtop - reftb.getBoundingBox().bottom) < COMPARE_PARAMETER) {
+                valid = true;
+            }
+        }
+        for (TextBlock reftb : reference) {
+            // invalidate if it cannot be close to a side specified
+            Log.d("CHECK STACK SIDE", String.valueOf(abs(tbside - (side < 0 ? reftb.getBoundingBox().left : reftb.getBoundingBox().right))));
+            if (abs(tbside - (side < 0 ? reftb.getBoundingBox().left : reftb.getBoundingBox().right)) > COMPARE_PARAMETER) {
+                valid = false;
+            }
+        }
+        Log.d("CHECKING IF STACK END", tb.getValue() + " " + valid);
+        return valid;
+    }
+
+    private ArrayList<Text> collapseBlockArray(ArrayList<TextBlock> bs) {
+        ArrayList<Text> toReturn = null;
+        if (bs.size() != 0) {
+            for (TextBlock tb : bs) {
+                if (toReturn == null) {
+                    toReturn = new ArrayList<>(tb.getComponents());
+                } else {
+                    toReturn.addAll(tb.getComponents());
+                }
+            }
+        }
+        return toReturn;
+    }
+
+    private TextBlock getHighestBlock(ArrayList<TextBlock> bs) {
+        int highestVal = bs.get(0).getBoundingBox().top;
+        TextBlock highest = bs.get(0);
+        for (TextBlock tb : bs) {
+            if (!tb.getValue().equals(bs.get(0).getValue())) {
+                if (tb.getBoundingBox().top < highestVal) {
+                    highestVal = tb.getBoundingBox().top;
+                    highest = tb;
+                }
+            }
+        }
+        return highest;
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
