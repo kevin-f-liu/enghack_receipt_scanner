@@ -47,11 +47,17 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.example.android.enghack_receipt_scanner.ui.CameraSource;
 import com.example.android.enghack_receipt_scanner.ui.CameraSourcePreview;
 import com.example.android.enghack_receipt_scanner.ui.GraphicOverlay;
+import com.google.android.gms.vision.text.Element;
+import com.google.android.gms.vision.text.Line;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Math.abs;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
@@ -60,6 +66,8 @@ import java.util.ArrayList;
  */
 public final class OcrCaptureActivity extends AppCompatActivity {
     private static final String TAG = "OcrCaptureActivity";
+    // Bounding box compare parameter
+    static int COMPARE_PARAMETER = 25;
 
     // Intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
@@ -327,12 +335,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         //OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
         TextBlock text = null;
         Intent data = new Intent();
-        ArrayList<String> output = new ArrayList<>();
+        ArrayList<TextBlock> output = new ArrayList<>();
         for (OcrGraphic graphic : mGraphicOverlay.mGraphics) {
             if (graphic != null) {
                 text = graphic.getTextBlock();
-                if (text != null && text.getValue() != null) {
-                    output.add(text.getValue());
+                if (text != null) {
+                    output.add(text);
                     Log.d("TextBlockObject", text.getValue());
                 } else {
                     Log.d(TAG, "text data is null");
@@ -341,16 +349,91 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 Log.d(TAG, "no text detected");
             }
         }
-        data.putExtra(TextBlockObject, output);
 
-        for (String str : output) {
-            Log.d("PRINTING_STRINGS", str + "\n");
-        }
-
+        ArrayList<Product> products = cleanTextBlockInfo(output);
+        data.putExtra(TextBlockObject, "asdf");
 
         setResult(CommonStatusCodes.SUCCESS, data);
         finish();
         return text != null;
+    }
+
+    private ArrayList<Product> cleanTextBlockInfo(ArrayList<TextBlock> intext) {
+        TextBlock items = null;
+        TextBlock prices = null;
+        ArrayList<Product> products = new ArrayList<>();
+
+        for (TextBlock block : intext) {
+            if (prices == null) {
+                ArrayList<? extends Text> lines = new ArrayList<>(block.getComponents());
+                if (lines.get(0).getValue().contains("$")) {
+                    // If the list's first item is a price
+                    prices = block;
+                }
+            }
+        }
+        if (prices == null) {
+            Log.e("NO PRICES!", "No prices found");
+            return null;
+        }
+        for (TextBlock block : intext) {
+            if (items == null && !block.equals(prices)){
+                int topCoordPrice = prices.getBoundingBox().top;
+                int topCoordItem = block.getBoundingBox().top;
+                Log.d("COORD DATA:", topCoordItem + "   " + topCoordPrice);
+                if (abs(topCoordItem - topCoordPrice) < COMPARE_PARAMETER) {
+                    items = block;
+                }
+            }
+        }
+        if (items == null) {
+            Log.e("NO ITEMS!", "No items found");
+            return null;
+        }
+        Log.d("PRICES:", prices.getValue());
+        Log.d("ITEMS:", items.getValue());
+        ArrayList<? extends Text> priceList = new ArrayList<>(prices.getComponents());
+        ArrayList<? extends Text> itemList = new ArrayList<>(items.getComponents());
+
+        int dif = itemList.size() - priceList.size();
+        for (int i = 1; i <= dif; i++) {
+            itemList.remove(itemList.size() - i);
+        }
+
+        for (Text t : priceList) {
+            Log.d("PRICES:", t.getValue());
+        }
+        for (Text t : itemList) {
+            Log.d("CULLEDITEMS:", t.getValue());
+        }
+
+        for (int i = 0; i < itemList.size(); i++) {
+            // Construct arraylist
+        }
+
+        /*
+        for (TextBlock block : intext) {
+           ArrayList<? extends Text> lines  = new ArrayList<>();
+            ArrayList<String> prices = new ArrayList<>();
+            ArrayList<String> items = new ArrayList<>();
+            lines = new ArrayList<>(block.getComponents());
+            Log.d("NUMBER_LINES", String.valueOf(lines.size()));
+           if (lines.size() > 1) {
+               // Lines inside
+               for (Text t : lines) {
+                   // Each line
+                   Log.d("LINE:", t.getValue());
+                   if (t.getValue().contains("$")) {
+                       prices.add(t.getValue());
+                   }
+               }
+           } else if (lines.size() == 1){
+               // One item inside
+               Log.d("WORD:", lines.get(0).getValue());
+           }
+        }
+        */
+        return null;
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {

@@ -11,6 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.text.TextBlock;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     static private int RC_BARCODE_CAPTURE = 9001;
@@ -43,10 +46,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        ArrayList<String> output = new ArrayList<>();
         if (requestCode == RC_BARCODE_CAPTURE) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
-
+                    output = data.getStringArrayListExtra("TextBlockObject");
                 }
             }
         }
