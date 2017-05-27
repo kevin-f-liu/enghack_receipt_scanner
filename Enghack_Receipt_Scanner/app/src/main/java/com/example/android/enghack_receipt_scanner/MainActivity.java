@@ -9,15 +9,20 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     static private int RC_BARCODE_CAPTURE = 9001;
 
     private ExpandableListView mExpandableList;
-    private ExpandableListAdapter mAdapater;
+    private ExpandableListAdapter mAdapter;
+    private List<String> mSettingHeaders;
+    private HashMap<String, String> mSettingChildren;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +62,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (mAdapater == null) {
-            mAdapater = new ExpandableListAdapter(this);
+        if (mAdapter == null) {
+            mAdapter = new ExpandableListAdapter(this);
             //populate data
-            mExpandableList.setAdapter(mAdapater);
+            mExpandableList.setAdapter(mAdapter);
         }
     }
+
+
+    private void save() {
+        
+    }
+
 }
