@@ -341,7 +341,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 text = graphic.getTextBlock();
                 if (text != null) {
                     output.add(text);
-                    Log.d("TextBlockObject", text.getValue());
+                    Log.d("TextBlockObject", text.getValue() + "  " + text.getBoundingBox().top);
                 } else {
                     Log.d(TAG, "text data is null");
                 }
@@ -361,9 +361,17 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private ArrayList<Product> cleanTextBlockInfo(ArrayList<TextBlock> intext) {
         TextBlock items = null;
         TextBlock prices = null;
+        TextBlock store = null;
+        TextBlock date = null;
         ArrayList<Product> products = new ArrayList<>();
 
+        int highestBlockTop = 999999;
         for (TextBlock block : intext) {
+            // Find store name as highest block
+            if (block.getBoundingBox().top < highestBlockTop) {
+                store = block;
+                highestBlockTop = store.getBoundingBox().top;
+            }
             if (prices == null) {
                 ArrayList<? extends Text> lines = new ArrayList<>(block.getComponents());
                 if (lines.get(0).getValue().contains("$")) {
@@ -390,6 +398,25 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.e("NO ITEMS!", "No items found");
             return null;
         }
+        // Find date block or containing block
+        for (TextBlock block : intext) {
+            if (!block.equals(items) && !block.equals(prices)) {
+                if (block.getComponents().size() == 1 && block.getValue().contains("/")) {
+                    date = block;
+                } else if (block.getComponents().size() > 1) {
+                    ArrayList<Text> elements = new ArrayList<>(block.getComponents());
+                    for (Text t : elements) {
+                        if (t.getValue().contains("/")) {
+                            date = block;
+                        }
+                    }
+                }
+            }
+        }
+        if (date == null) {
+            Log.e("NO DATE!", "No date found");
+            return null;
+        }
         Log.d("PRICES:", prices.getValue());
         Log.d("ITEMS:", items.getValue());
         ArrayList<? extends Text> priceList = new ArrayList<>(prices.getComponents());
@@ -400,6 +427,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             itemList.remove(itemList.size() - i);
         }
 
+        Log.d("STORE:", store.getValue());
+        Log.d("DATE:", date.getValue());
         for (Text t : priceList) {
             Log.d("PRICES:", t.getValue());
         }
@@ -408,7 +437,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
 
         for (int i = 0; i < itemList.size(); i++) {
-            // Construct arraylist
+            // Construct arraylist of product
+            products.add(new Product(itemList.get(i), store.getValue(), priceList.get(i), date.getValue()));
         }
 
         /*
