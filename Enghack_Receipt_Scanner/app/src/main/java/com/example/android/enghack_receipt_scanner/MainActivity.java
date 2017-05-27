@@ -37,12 +37,15 @@ import static android.R.attr.width;
 
 public class MainActivity extends AppCompatActivity {
     static private int RECEIPT_CAPTURE = 9001;
+    static private int COMPANY = 1;
+    static private int MONTHLY = 2;
 
     private ExpandableListView mExpandableList;
     private ExpandableListAdapter mAdapter;
     private List<String> mSettingHeaders;
     private HashMap<String, List<Product>> mSettingChildren;
     private SharedPreferences mPreferences;
+    private int mCurrentMode;
 
 
     @Override
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mCurrentMode = 1;
 
         TextView cameraText = (TextView) findViewById(R.id.camera_text);
         cameraText.setTypeface(getFATypeface(this));
@@ -76,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         mSettingHeaders = getHeaders();
         mSettingChildren = getChildren(mSettingHeaders);
         mAdapter = new ExpandableListAdapter(this);
+
         mAdapter.populateHeaders(mSettingHeaders);
         mAdapter.populateChildren(mSettingChildren);
         mExpandableList.setAdapter(mAdapter);
@@ -108,6 +113,35 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.reset_button) {
             reset();
             return true;
+        }
+        if (item.getItemId() == R.id.alt_sort_button) {
+            if (mCurrentMode == COMPANY){
+                mAdapter = new ExpandableListMonthAdapter(this);
+                ArrayList<Product> allProducts = new ArrayList<>();
+                for (String header : mSettingHeaders){
+                    for (Product product : mSettingChildren.get(header)){
+                        if (!product.getName().toUpperCase().equals("TOTAL")) {
+                            allProducts.add(product);
+                        }
+                    }
+                }
+                mAdapter.addData(allProducts);
+                mExpandableList.setAdapter(mAdapter);
+                for (int i = 0; i < mAdapter.getGroupCount(); i++) {
+                    mExpandableList.expandGroup(i);
+                }
+                mCurrentMode = MONTHLY;
+            } else if (mCurrentMode == MONTHLY) {
+                mAdapter = new ExpandableListAdapter(this);
+
+                mAdapter.populateHeaders(mSettingHeaders);
+                mAdapter.populateChildren(mSettingChildren);
+                mExpandableList.setAdapter(mAdapter);
+                for (int i = 0; i < mAdapter.getGroupCount(); i++) {
+                    mExpandableList.expandGroup(i);
+                }
+                mCurrentMode = COMPANY;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

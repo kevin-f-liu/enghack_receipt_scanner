@@ -75,11 +75,7 @@ public class Product{
         name = initName;
         store = initStore;
         try {
-//            if (initPrice.contains("$")) {
-//                price = Float.valueOf(initPrice.substring(1));
-//            } else {
-                price = Float.valueOf(initPrice.substring(1));
-//            }
+            price = Float.valueOf(initPrice.substring(1));
         } catch (Exception e) {
             Log.d("CONSTRUCTOR", e.getClass().toString());
             Log.d("CONSTRUCTOR_PRICE", initPrice);

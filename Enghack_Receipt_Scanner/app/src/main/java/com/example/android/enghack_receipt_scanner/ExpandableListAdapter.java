@@ -20,14 +20,24 @@ import java.util.StringTokenizer;
  */
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter{
-    private Context mContext;
-    private List<String> mHeaders;
-    private HashMap<String, List<Product>> mChildren;
+    protected Context mContext;
+    protected List<String> mHeaders;
+    protected HashMap<String, List<Product>> mChildren;
+
+    protected ExpandableListAdapter() {
+        mHeaders = new ArrayList<>();
+        mChildren = new HashMap<>();
+    }
 
     public ExpandableListAdapter(Context context){
         mContext = context;
         mHeaders = new ArrayList<>();
         mChildren = new HashMap<>();
+    }
+
+    //for overriding
+    protected void addData(ArrayList<Product> input) {
+
     }
 
     public void populateHeaders(List<String> data){
@@ -100,12 +110,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        Log.d("GROUP", String.valueOf(groupPosition));
-        Log.d("MAXCHILD", String.valueOf(getChildrenCount(groupPosition)));
-        Log.d("CHILD", String.valueOf(childPosition));
 
         if (true) {
-            TextView price, name;
+            TextView price, name, date;
             FrameLayout topBorder;
             if (childPosition == 0) {
                 convertView = layoutInflater.inflate(R.layout.list_child_date, parent, false);
@@ -113,7 +120,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
                 price = (TextView) convertView.findViewById(R.id.list_child_date_price);
                 topBorder = (FrameLayout) convertView.findViewById(R.id.date_top_border);
                 name.setText(((Product) getChild(groupPosition, childPosition)).getName());
-                TextView date = (TextView) convertView.findViewById(R.id.date_text);
+                date = (TextView) convertView.findViewById(R.id.date_text);
                 Product product = ((Product) getChild(groupPosition, childPosition));
                 date.setText(String.valueOf(product.getMonth())+"/"+ String.valueOf(product.getDay())
                     +"/"+String.valueOf(product.getYear()));
@@ -126,6 +133,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
                 name = (TextView) convertView.findViewById(R.id.list_child_date_name);
                 topBorder = (FrameLayout) convertView.findViewById(R.id.date_top_border);
                 name.setText(((Product) getChild(groupPosition, childPosition)).getName());
+                date = (TextView) convertView.findViewById(R.id.date_text);
+                Product product = ((Product) getChild(groupPosition, childPosition));
+                date.setText(String.valueOf(product.getMonth())+"/"+ String.valueOf(product.getDay())
+                        +"/"+String.valueOf(product.getYear()));
             }
             else {
                 convertView = layoutInflater.inflate(R.layout.list_child, parent, false);
