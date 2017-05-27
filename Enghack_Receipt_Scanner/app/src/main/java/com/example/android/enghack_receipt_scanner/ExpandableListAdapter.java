@@ -102,7 +102,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
         Log.d("MAXCHILD", String.valueOf(getChildrenCount(groupPosition)));
         Log.d("CHILD", String.valueOf(childPosition));
 
-        if (convertView == null) {
+        if (true) {
             TextView price;
             if (childPosition == 0) {
                 convertView = layoutInflater.inflate(R.layout.list_child_date, parent, false);
