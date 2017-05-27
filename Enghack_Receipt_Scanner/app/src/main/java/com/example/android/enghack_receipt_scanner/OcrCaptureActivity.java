@@ -88,6 +88,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
 
+
     /**
      * Initializes the UI and creates the detector pipeline.
      */
@@ -354,6 +355,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         ArrayList<String> serializedProducts = new ArrayList<>();
         try {
             for (Product item : products) {
+                Log.d("SERIALIZED", item.serialize());
                 serializedProducts.add(item.serialize());
             }
         } catch (Exception e) {

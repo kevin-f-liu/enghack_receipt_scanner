@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.text.TextBlock;
@@ -84,37 +85,44 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RECEIPT_CAPTURE) {
-            ArrayList<String> output = new ArrayList<>();
-            ArrayList<Product> products = new ArrayList<>();
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    String store = "";
-                    output = data.getStringArrayListExtra("TextBlockObject");
-                    for (String item : output) {
-                        products.add(Product.makeFromSerialize(item));
-                    }
-                    store = products.get(products.size()-1).getStore();
-                    Log.d("STORE", store);
+            try {
+                ArrayList<String> output = new ArrayList<>();
+                ArrayList<Product> products = new ArrayList<>();
+                if (resultCode == CommonStatusCodes.SUCCESS) {
+                    if (data != null) {
+                        String store = "";
+                        output = data.getStringArrayListExtra("TextBlockObject");
+                        for (String item : output) {
+                            Log.d("SERIALIZE", item);
+                            products.add(Product.makeFromSerialize(item));
+                        }
+                        store = products.get(products.size() - 1).getStore();
+                        Log.d("STORE", store);
 
-                    if (mSettingHeaders == null) {
-                        mSettingHeaders = new ArrayList<>();
+                        if (mSettingHeaders == null) {
+                            mSettingHeaders = new ArrayList<>();
+                        }
+                        if (!mSettingHeaders.contains(store)) {
+                            mSettingHeaders.add(store);
+                        }
+                        if (mSettingChildren == null) {
+                            mSettingChildren = new HashMap<>();
+                        }
+                        if (mSettingChildren.containsKey(store)) {
+                            mSettingChildren.get(store).addAll(products);
+                        } else {
+                            mSettingChildren.put(store, products);
+                        }
+                        mAdapter = new ExpandableListAdapter(this);
+                        mAdapter.populateHeaders(mSettingHeaders);
+                        mAdapter.populateChildren(mSettingChildren);
+                        mExpandableList.setAdapter(mAdapter);
+//                        for (int i = 0; i < mAdapter.getGroupCount(); i++) {
+//                            mExpandableList.expandGroup(i);
+//                        }
                     }
-                    if (!mSettingHeaders.contains(store)) {
-                        mSettingHeaders.add(store);
-                    }
-                    if (mSettingChildren == null) {
-                        mSettingChildren = new HashMap<>();
-                    }
-                    if (mSettingChildren.containsKey(store)) {
-                        mSettingChildren.get(store).addAll(products);
-                    } else {
-                        mSettingChildren.put(store, products);
-                    }
-                    mAdapter = new ExpandableListAdapter(this);
-                    mAdapter.populateHeaders(mSettingHeaders);
-                    mAdapter.populateChildren(mSettingChildren);
-                    mExpandableList.setAdapter(mAdapter);
                 }
+            }catch (Exception e) {
             }
         }
     }

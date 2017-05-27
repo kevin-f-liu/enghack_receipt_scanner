@@ -144,6 +144,7 @@ public class Product{
 
 
     public String serialize() {
+        Log.d("SERIALIZE PRICE", price.toString());
         String serialized = name+"&%#!"+store+"&%#!"+price.toString()+"&%#!"+month.toString()+"&%#!"+day.toString()+"&%#!"+year.toString();
         return serialized;
     }

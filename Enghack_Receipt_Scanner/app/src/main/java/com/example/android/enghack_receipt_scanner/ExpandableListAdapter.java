@@ -1,6 +1,7 @@
 package com.example.android.enghack_receipt_scanner;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,16 +53,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        int size = 0;
-
-        for (String title : mHeaders) {
-            if (mChildren.containsKey(title)){
-                if (mChildren.get(title) != null){
-                    size += mChildren.get(title).size();
-                }
-            }
-        }
-        return size;
+        return mChildren.get(getGroup(groupPosition)).size();
     }
 
     @Override
@@ -105,11 +97,31 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+        Log.d("GROUP", String.valueOf(groupPosition));
+        Log.d("MAXCHILD", String.valueOf(getChildrenCount(groupPosition)));
+        Log.d("CHILD", String.valueOf(childPosition));
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_child, parent, false);
             TextView title = (TextView) convertView.findViewById(R.id.list_child_name);
-            title.setText(((Product)getChild(groupPosition, childPosition)).getName());
+
+            if (childPosition == 0) {
+                title.setText(((Product) getChild(groupPosition, childPosition)).getMonth().toString()+"/"
+                        +((Product) getChild(groupPosition, childPosition)).getDay()+"/"
+                        +((Product) getChild(groupPosition, childPosition)).getYear()+ " - " + ((Product) getChild(groupPosition, childPosition)).getName());
+            }
+            else if (((Product) getChild(groupPosition, childPosition)).getDay() != ((Product) getChild(groupPosition, childPosition-1)).getDay()
+                    || ((Product) getChild(groupPosition, childPosition)).getMonth() != ((Product) getChild(groupPosition, childPosition-1)).getMonth()
+                    || (((Product) getChild(groupPosition, childPosition)).getYear() - ((Product) getChild(groupPosition, childPosition-1)).getYear()) != 0) {
+                title.setText(((Product) getChild(groupPosition, childPosition)).getMonth().toString()+"/"
+                        +((Product) getChild(groupPosition, childPosition)).getDay()+"/"
+                        +((Product) getChild(groupPosition, childPosition)).getYear()+ " - " + ((Product) getChild(groupPosition, childPosition)).getName());
+//                Log.d("Value", String.valueOf(((((Product) getChild(groupPosition, childPosition)).getYear()) - (((Product) getChild(groupPosition, childPosition-1)).getYear()))==0));
+//                Log.d("BOOLEAN", String.valueOf(((Product) getChild(groupPosition, childPosition)).getYear()==((Product) getChild(groupPosition, childPosition-1)).getYear()));
+            }
+            else {
+                title.setText("    " + ((Product) getChild(groupPosition, childPosition)).getName());
+            }
             TextView price = (TextView) convertView.findViewById(R.id.list_child_price);
             price.setText("$" + ((Product)getChild(groupPosition, childPosition)).getPrice().toString());
         }
