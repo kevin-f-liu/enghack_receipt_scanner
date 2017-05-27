@@ -1,5 +1,6 @@
 package com.example.android.enghack_receipt_scanner;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,6 +8,9 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
@@ -49,6 +53,21 @@ public class MainActivity extends AppCompatActivity {
         mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.reset_button) {
+            reset();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     public Typeface getFATypeface(Context context) {
         return Typeface.createFromAsset(context.getAssets(), "fonts/fontawesome-webfont.ttf");
@@ -106,6 +125,12 @@ public class MainActivity extends AppCompatActivity {
             else return new ArrayList<String>(temp);
         }
         return null;
+    }
+
+    private void reset() {
+        if (mPreferences != null) mPreferences.edit().clear().commit();
+        mAdapter = new ExpandableListAdapter(this);
+        mExpandableList.setAdapter(mAdapter);
     }
 
 }
