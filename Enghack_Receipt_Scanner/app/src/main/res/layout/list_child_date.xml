@@ -15,6 +15,10 @@
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"/>
 
+    <FrameLayout
+        android:id="@+id/date_top_border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></FrameLayout>
     <RelativeLayout
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content"
