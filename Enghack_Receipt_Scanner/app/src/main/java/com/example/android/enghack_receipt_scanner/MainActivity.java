@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ExpandableListView mExpandableList;
     private ExpandableListAdapter mAdapter;
     private List<String> mSettingHeaders;
-    private HashMap<String, List<String>> mSettingChildren;
+    private HashMap<String, List<Product>> mSettingChildren;
     private SharedPreferences mPreferences;
 
 
@@ -104,11 +104,16 @@ public class MainActivity extends AppCompatActivity {
             delete("Headers");
         }
         mPreferences.edit().putStringSet("Headers", new HashSet<String>(mSettingHeaders)).commit();
+
         for (String title : mSettingHeaders) {
+            List<String> serializedProducts = new ArrayList<>();
             if (mPreferences.contains(title)) {
                 delete(title);
             }
-            mPreferences.edit().putStringSet(title, new HashSet<String>(mSettingChildren.get(title))).commit();
+            for (Product item : mSettingChildren.get(title)) {
+                serializedProducts.add(item.serialize());
+            }
+            mPreferences.edit().putStringSet(title, new HashSet<String>(serializedProducts)).commit();
         }
     }
 
@@ -125,6 +130,24 @@ public class MainActivity extends AppCompatActivity {
             else return new ArrayList<String>(temp);
         }
         return null;
+    }
+
+    private HashMap<String, List<Product>> getChildren(List<String> headers){
+        HashMap<String, List<Product>> toReturn = new HashMap<>();
+
+        for (String title : headers) {
+            Set<String> temp = mPreferences.getStringSet(title, null);
+            if (temp != null) {
+                ArrayList<String> serializedList = new ArrayList<String>(temp);
+                ArrayList<Product> productList = new ArrayList<Product>();
+                for (String serializedData : serializedList) {
+                    productList.add(Product.makeFromSerialize(serializedData));
+                }
+                toReturn.put(title, productList);
+            }
+        }
+
+        return toReturn;
     }
 
     private void reset() {

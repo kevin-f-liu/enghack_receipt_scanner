@@ -6,7 +6,7 @@ import java.util.HashMap;
  * Created by Kenta on 2017-05-26.
  */
 
-public class Product {
+public class Product{
     private String name;
     private String store;
     private Float price;
@@ -53,6 +53,50 @@ public class Product {
         setMonthName();
     }
 
+    public Product(String initName, String initStore, String initPrice, String initMonth, String initDay, String initYear){
+        name = initName;
+        store = initStore;
+        price = Float.valueOf(initPrice);
+        try {
+            month = Integer.valueOf(initMonth);
+        } catch (NumberFormatException e) {
+            setMonth(month);
+        }
+        day = Integer.valueOf(initDay);
+        year = Integer.valueOf(initYear);
+        setMonthName();
+    }
+
+    public String serialize() {
+        return name+"&%"+store+"&%"+price.toString()+"&%"+month.toString()+"&%"+day.toString()+"&%"+year.toString();
+    }
+
+    public static Product makeFromSerialize(String input) {
+        int index;
+        index = input.indexOf("&%");
+        String name = input.substring(0, index);
+
+        String temp = input.substring(index+2);
+        index = input.indexOf("&%");
+        String store = input.substring(0, index);
+
+        String temp2 = temp.substring(index+2);
+        index = temp2.indexOf("&%");
+        String price = temp2.substring(0, index);
+
+        String temp3 = temp2.substring(index+2);
+        index = temp3.indexOf("&%");
+        String month = temp3.substring(0, index);
+
+        String temp4 = temp3.substring(index+2);
+        index = temp4.indexOf("&%");
+        String day = temp4.substring(0, index);
+
+        String year = temp4.substring(index+2);
+
+        return new Product(name, store, price, month, day, year);
+    }
+
     public void setName(String newName){
         name = newName;
     }
@@ -65,11 +109,7 @@ public class Product {
         price = newPrice;
     }
 
-    public void setPrice(float newPrice){
-        price = newPrice;
-    }
-
-    public void setMonth(int newMonth){
+    public void setMonth(Integer newMonth){
         month = newMonth;
     }
 
@@ -81,11 +121,11 @@ public class Product {
         }
     }
 
-    public void setDay(int newDay){
+    public void setDay(Integer newDay){
         day = newDay;
     }
 
-    public void setYear(int newYear){
+    public void setYear(Integer newYear){
         year = newYear;
     }
 

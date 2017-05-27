@@ -18,7 +18,7 @@ import java.util.List;
 public class ExpandableListAdapter extends BaseExpandableListAdapter{
     private Context mContext;
     private List<String> mHeaders;
-    private HashMap<String, List<String>> mChildren;
+    private HashMap<String, List<Product>> mChildren;
 
     public ExpandableListAdapter(Context context){
         mContext = context;
@@ -34,7 +34,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
         }
     }
 
-    public void populateChildren(){}
+    public void populateChildren(HashMap<String, List<Product>> data){
+        for (String category : data.keySet()) {
+            if (!mChildren.containsKey(category)) {
+                mChildren.put(category, new ArrayList<Product>());
+            }
+            for (Product item : data.get(category)) {
+                mChildren.get(category).add(item);
+            }
+        }
+    }
 
     @Override
     public int getGroupCount() {
@@ -87,7 +96,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_header, parent, false);
             TextView title = (TextView) convertView.findViewById(R.id.list_header_text);
-            title.setText("TEMP_STORE");
+            title.setText((String)getGroup(groupPosition));
         }
 
         return convertView;
@@ -100,9 +109,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter{
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_header, parent, false);
             TextView title = (TextView) convertView.findViewById(R.id.list_child_name);
-            title.setText("TEMP_NAME");
+            title.setText(((Product)getChild(groupPosition, childPosition)).getName());
             TextView price = (TextView) convertView.findViewById(R.id.list_child_price);
-            price.setText("TEMP_PRICE");
+            price.setText("$" + ((Product)getChild(groupPosition, childPosition)).getPrice().toString());
         }
 
         return convertView;
