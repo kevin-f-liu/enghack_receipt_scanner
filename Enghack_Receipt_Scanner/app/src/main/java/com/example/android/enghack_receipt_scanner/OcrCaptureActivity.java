@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.Math.abs;
 
@@ -349,12 +350,13 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         TextBlock text = null;
         Intent data = new Intent();
         ArrayList<TextBlock> output = new ArrayList<>();
-        for (OcrGraphic graphic : mGraphicOverlay.mGraphics) {
+        Set<OcrGraphic> mGraphics = mGraphicOverlay.mGraphics;
+        for (OcrGraphic graphic : mGraphics) {
             if (graphic != null) {
                 text = graphic.getTextBlock();
                 if (text != null) {
                     output.add(text);
-                    Log.d("TextBlockObject", text.getValue() + "  " + text.getBoundingBox().top);
+                    Log.d("TextBlockObject", text.getValue() + "  " + text.getBoundingBox().top + "  " + text.getBoundingBox().left + "  " + text.getBoundingBox().bottom + "  " + text.getBoundingBox().right);
                 } else {
                     Log.d(TAG, "text data is null");
                 }
@@ -428,10 +430,19 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         // Find the item name block(s) using alignment with pricing and each other
         int topCoordPrice = getHighestBlock(priceBlockList).getBoundingBox().top;
         for (TextBlock block : intext) {
+            // Find head
             if (itemBlockList.size() == 0 && !priceBlockList.contains(block)){
                 int topCoordItem = block.getBoundingBox().top;
                 //Log.d("COORD DATA:", topCoordItem + "   " + topCoordPrice);
                 if (abs(topCoordItem - topCoordPrice) < COMPARE_PARAMETER) {
+                    itemBlockList.add(block);
+                }
+            }
+        }
+        for (TextBlock block : intext) {
+            // Find other blocks that share left side plus bottom-top
+            if (!priceBlockList.contains(block) && !itemBlockList.contains(block)) {
+                if (checkStackUnder(block, itemBlockList, -1)) {
                     itemBlockList.add(block);
                 }
             }
@@ -493,6 +504,28 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
         Log.d("SIZE", String.valueOf(products.size()));
         return products;
+    }
+
+    private boolean checkStackUnder(TextBlock tb, ArrayList<TextBlock> reference, int side) {
+        int tbside = side < 0 ? tb.getBoundingBox().left : tb.getBoundingBox().right;
+
+        int tbtop = tb.getBoundingBox().top;
+        boolean valid = false;
+        for (TextBlock reftb : reference) { //402
+            Log.d("CHECK STACK TOP", tbtop + " " + reftb.getBoundingBox().bottom + " " + String.valueOf(abs(tbtop - reftb.getBoundingBox().bottom)));
+            if (abs(tbtop - reftb.getBoundingBox().bottom) < COMPARE_PARAMETER) {
+                valid = true;
+            }
+        }
+        for (TextBlock reftb : reference) {
+            // invalidate if it cannot be close to a side specified
+            Log.d("CHECK STACK SIDE", String.valueOf(abs(tbside - (side < 0 ? reftb.getBoundingBox().left : reftb.getBoundingBox().right))));
+            if (abs(tbside - (side < 0 ? reftb.getBoundingBox().left : reftb.getBoundingBox().right)) > COMPARE_PARAMETER) {
+                valid = false;
+            }
+        }
+        Log.d("CHECKING IF STACK END", tb.getValue() + " " + valid);
+        return valid;
     }
 
     private ArrayList<Text> collapseBlockArray(ArrayList<TextBlock> bs) {
