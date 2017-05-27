@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         ActionBar topBar = getSupportActionBar();
         if (topBar != null) {
             topBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#6A8347")));
+            topBar.setDisplayShowHomeEnabled(true);
+            topBar.setIcon(R.mipmap.ic_launcher);
         }
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);

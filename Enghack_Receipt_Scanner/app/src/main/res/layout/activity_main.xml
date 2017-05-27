@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorLight"
-    tools:context="com.example.android.enghack_receipt_scanner.MainActivity">
+    tools:context="com.example.android.enghack_receipt_scanner.MainActivity"
+    android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
