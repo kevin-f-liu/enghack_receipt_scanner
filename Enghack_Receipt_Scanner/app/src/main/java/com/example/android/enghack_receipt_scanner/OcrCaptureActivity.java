@@ -373,8 +373,9 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         ArrayList<String> serializedProducts = new ArrayList<>();
         try {
             for (Product item : products) {
-                Log.d("SERIALIZED", item.serialize());
-                serializedProducts.add(item.serialize());
+                String tempSerial = item.serialize();
+                Log.d("SERIALIZED", tempSerial);
+                serializedProducts.add(tempSerial);
             }
         } catch (Exception e) {
             Log.d("ADDING_SERIALIZED", e.getClass().toString());
@@ -451,13 +452,24 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         }
         Log.d("PRICES:", prices.getValue());
         Log.d("ITEMS:", items.getValue());
-        ArrayList<? extends Text> priceList = new ArrayList<>(prices.getComponents());
-        ArrayList<? extends Text> itemList = new ArrayList<>(items.getComponents());
+        ArrayList<Text> priceList = new ArrayList<>();
+        ArrayList<Text> itemList = new ArrayList<>();
+        ArrayList<Text> tempPriceList = new ArrayList<>(prices.getComponents());
+        ArrayList<Text> tempItemList = new ArrayList<>(items.getComponents());
 
+        for (int i = 0; i < tempItemList.size(); i++) {
+            priceList.add(tempPriceList.get(i));
+            itemList.add(tempItemList.get(i));
+            if (tempItemList.get(i).getValue().toLowerCase().equals("total")) {
+                break;
+            }
+        }
+        /*
         int dif = itemList.size() - priceList.size();
         for (int i = 1; i <= dif; i++) {
             itemList.remove(itemList.size() - i);
         }
+        */
 
         Log.d("STORE:", storeName.getValue());
         Log.d("DATE:", date.getValue());
