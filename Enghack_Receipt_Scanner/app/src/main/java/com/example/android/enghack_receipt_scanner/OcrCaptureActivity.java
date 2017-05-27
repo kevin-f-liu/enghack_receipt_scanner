@@ -418,11 +418,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             Log.e("NO PRICES!", "No prices found");
             return null;
         }
+        // Finding the item data
         for (TextBlock block : intext) {
             if (items == null && !block.equals(prices)){
                 int topCoordPrice = prices.getBoundingBox().top;
                 int topCoordItem = block.getBoundingBox().top;
-                Log.d("COORD DATA:", topCoordItem + "   " + topCoordPrice);
+                //Log.d("COORD DATA:", topCoordItem + "   " + topCoordPrice);
                 if (abs(topCoordItem - topCoordPrice) < COMPARE_PARAMETER) {
                     items = block;
                 }
