@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -177,6 +178,18 @@ public class ExpandableListMonthAdapter extends ExpandableListAdapter {
                 }
             }
             title.setText(output);
+
+            RelativeLayout temp = (RelativeLayout) convertView.findViewById(R.id.list_header_layout);
+
+            //CODE FOR ADD MARGINS
+            if (groupPosition != 0) {
+                RelativeLayout.LayoutParams relativeParams = (RelativeLayout.LayoutParams) temp.getLayoutParams();
+                relativeParams.topMargin = 13;
+                temp.setLayoutParams(relativeParams);
+                temp.requestLayout();
+                RelativeLayout disableClick = (RelativeLayout) convertView.findViewById(R.id.list_header_disabled);
+                disableClick.setEnabled(false);
+            }
         }
 
         return convertView;
@@ -226,4 +239,5 @@ public class ExpandableListMonthAdapter extends ExpandableListAdapter {
 
         return convertView;
     }
+
 }
