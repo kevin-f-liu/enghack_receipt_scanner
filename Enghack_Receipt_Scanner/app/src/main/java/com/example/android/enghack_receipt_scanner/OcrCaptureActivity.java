@@ -350,8 +350,15 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                 Log.d(TAG, "no text detected");
             }
         }
-
+        if (output.size() == 0) {
+            return false;
+        }
+        Log.d("CONTENTS OF RAW OUTPUT", output.toString());
         ArrayList<Product> products = cleanTextBlockInfo(output);
+        if (products == null) {
+            // Catch no price safely
+            return false;
+        }
         ArrayList<String> serializedProducts = new ArrayList<>();
         try {
             for (Product item : products) {
