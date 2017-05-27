@@ -268,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("RESET", "RESETTING");
         if (mPreferences != null) mPreferences.edit().clear().commit();
         Log.d("PREFERNCES", mPreferences.getAll().toString());
+        mCurrentMode = COMPANY;
         mAdapter = new ExpandableListAdapter(this);
         mSettingHeaders = new ArrayList<>();
         mSettingChildren = new HashMap<>();
