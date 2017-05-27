@@ -51,6 +51,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Activity for the multi-tracker app.  This app detects text and displays the value with the
@@ -323,23 +324,27 @@ public final class OcrCaptureActivity extends AppCompatActivity {
      * @return true if the activity is ending.
      */
     private boolean onTap(float rawX, float rawY) {
-        OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
+        //OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
         TextBlock text = null;
-        if (graphic != null) {
-            text = graphic.getTextBlock();
-            if (text != null && text.getValue() != null) {
-                Intent data = new Intent();
-                data.putExtra(TextBlockObject, text.getValue());
-                setResult(CommonStatusCodes.SUCCESS, data);
-                finish();
-            }
-            else {
-                Log.d(TAG, "text data is null");
+        Intent data = new Intent();
+        ArrayList<String> output = new ArrayList<>();
+        for (OcrGraphic graphic : mGraphicOverlay.mGraphics) {
+            if (graphic != null) {
+                text = graphic.getTextBlock();
+                if (text != null && text.getValue() != null) {
+                    output.add(text.getValue());
+                    Log.d("TextBlockObject", text.getValue());
+                } else {
+                    Log.d(TAG, "text data is null");
+                }
+            } else {
+                Log.d(TAG, "no text detected");
             }
         }
-        else {
-            Log.d(TAG,"no text detected");
-        }
+        data.putExtra(TextBlockObject, output);
+        Log.d("ARRAYLIST", output.toString());
+        setResult(CommonStatusCodes.SUCCESS, data);
+        finish();
         return text != null;
     }
 
