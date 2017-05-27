@@ -342,7 +342,12 @@ public final class OcrCaptureActivity extends AppCompatActivity {
             }
         }
         data.putExtra(TextBlockObject, output);
-        Log.d("ARRAYLIST", output.toString());
+
+        for (String str : output) {
+            Log.d("PRINTING_STRINGS", str + "\n");
+        }
+
+
         setResult(CommonStatusCodes.SUCCESS, data);
         finish();
         return text != null;
